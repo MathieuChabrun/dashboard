@@ -1,0 +1,16 @@
+item,value
+total,46595.0
+fuel:Diesel,26486.0
+fuel:Gasoline,19417.0
+fuel:Propane,613.0
+fuel:Electric,15.0
+fuel:Natural gas,0.0
+fuel:Hybrid (all types),17.0
+fuel:CNG,47.0
+fuel:Flexible Fuel,0.0
+fuel:Alternative fuel (not otherwise specified),0.0
+fuel:Fuel type unknown,0.0
+age:2020 or newer,9733.0
+age:2010-2019,30775.0
+age:2000-2009,5936.0
+age:1999 or older,151.0
