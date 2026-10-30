@@ -13,6 +13,41 @@ import plotly.graph_objects as go
 import streamlit as st
 
 st.set_page_config(page_title="NY Clean School Zones Monitor", page_icon="🚌", layout="wide")
+st.markdown("""
+<style>
+    .stApp { background: #f7faf8; color: #183c32; }
+    .block-container { max-width: 1120px; padding-top: 2.5rem; padding-bottom: 3rem; }
+    [data-testid="stSidebar"] { background: #edf4ef; }
+    h1 { letter-spacing: -0.045em; font-weight: 750 !important; }
+    h2, h3 { letter-spacing: -0.025em; }
+    [data-testid="stMetric"] {
+        background: white; border: 1px solid #deebe3; border-radius: 18px;
+        padding: 22px 26px; box-shadow: 0 4px 18px rgba(24,60,50,.035);
+    }
+    [data-testid="stMetricValue"] { color: #1f6f5c; font-weight: 700; }
+    [data-testid="stMetricLabel"] { color: #536b61; }
+    [data-testid="stCaptionContainer"] { color: #62756b; }
+    [data-testid="stPlotlyChart"] {
+        background: white; border: 1px solid #deebe3; border-radius: 18px;
+        padding: 10px; margin-top: 12px;
+    }
+    .interpretation {
+        background: #eaf3ed; border-left: 3px solid #49856c;
+        border-radius: 0 14px 14px 0; padding: 18px 22px; margin: 18px 0 24px;
+    }
+    .interpretation-label {
+        color: #32644f; font-size: .75rem; font-weight: 700;
+        letter-spacing: .09em; text-transform: uppercase; margin-bottom: 7px;
+    }
+    .interpretation p { color: #4c6257; font-size: 1rem; line-height: 1.7; margin: 0; }
+    .phase-label { color: #49856c; font-size: .8rem; font-weight: 650;
+                   letter-spacing: .09em; text-transform: uppercase; margin-top: 18px; }
+    @media (max-width: 640px) {
+        .block-container { padding-top: 1.5rem; }
+        .interpretation { padding: 15px; }
+    }
+</style>
+""", unsafe_allow_html=True)
 
 WHO = 5.0  # WHO 2021 annual PM2.5 guideline, µg/m³
 NY_FLEET = 46595
@@ -85,13 +120,15 @@ def pct(v):
 
 tiles = [
     (1, "Buses in Q2–Q3", pct(v1)),
-    (2, "Fleet size", f"{v3:,.0f}"),
-    (3, "Buses not electric", pct(v2)),
+    (2, "Buses not electric", pct(v2)),
+    (3, "Fleet size", f"{v3:,.0f}"),
 ]
 
 # ---------------------------------------------------------------- pages
 st.title("NY Clean School Zones")
+st.caption("Cleaner air around schools · New York")
 page = st.sidebar.radio("Page", list(PHASES), format_func=lambda n: f"{n}. {PHASES[n]}")
+st.markdown(f'<div class="phase-label">Step {page} of 4 · Decision process</div>', unsafe_allow_html=True)
 if page != 4:
     st.caption(f"{len(df):,} districts selected · New York State")
 else:
@@ -103,12 +140,32 @@ if page != 4:
 else:
     st.markdown("**Potential cancer risk by distance from idling buses**")
 
+interpretations = {
+    1: "Many school buses are in districts in PM2.5 quartiles Q2 and Q3. "
+       "This helps us understand where buses are located in the national pollution ranking. "
+       "In the Intelligence phase, we study the problem before looking for solutions. "
+       "Quartiles show a ranking, not a health limit.",
+    2: "Almost all school buses are not electric. Many still use fuels that produce emissions. "
+       "In the Design phase, we compare possible solutions. "
+       "Replacing the whole fleet takes time, so we also consider ways to reduce student exposure now.",
+    3: "New York has a very large school bus fleet. Our student association cannot replace thousands of buses. "
+       "In the Choice phase, we select a realistic solution: local Clean School Zones around schools.",
+    4: "The Sacramento study compares risk at different idling times and distances from buses. "
+       "Longer idling can increase risk, while more distance can reduce it. "
+       "In the Implementation phase, the 20 m, 40 m and 60 m scenarios help us plan bus stops and waiting areas. "
+       "This is an external reference, not a risk estimate for New York or a fixed safe distance.",
+}
+st.markdown(
+    f'<div class="interpretation"><div class="interpretation-label">What this tells us</div>'
+    f'<p>{interpretations[page]}</p></div>', unsafe_allow_html=True,
+)
+
 
 def chart(fig, selectable=False):
     fig.update_layout(
         height=400, margin=dict(t=35, b=20, l=20, r=50),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#64748b"), showlegend=False,
+        font=dict(color="#536b61", size=13), showlegend=False,
     )
     fig.update_xaxes(showgrid=False, zeroline=False)
     fig.update_yaxes(gridcolor="rgba(148,163,184,0.15)", zeroline=False)
@@ -161,7 +218,7 @@ if page == 1:
     else:
         st.caption("No fleet and air pollution data available for this selection.")
 
-elif page == 3:
+elif page == 2:
     fuels = fleet_sum[[i for i in fleet_sum.index if i.startswith("fuel:")]].copy()
     fuels.index = [i[5:].replace(" (all types)", "").replace(" (not otherwise specified)", "") for i in fuels.index]
     fuels = fuels[fuels > 0].sort_values()
@@ -177,7 +234,7 @@ elif page == 3:
     chart(fig)
     st.caption(comment)
 
-elif page == 2:
+elif page == 3:
     ages = fleet_sum[[i for i in fleet_sum.index if i.startswith("age:")]].copy()
     ages.index = [i[4:] for i in ages.index]
     ages = ages.reindex(["2020 or newer", "2010-2019", "2000-2009", "1999 or older"])
