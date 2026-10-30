@@ -155,10 +155,6 @@ interpretations = {
        "In the Implementation phase, the 20 m, 40 m and 60 m scenarios help us plan bus stops and waiting areas. "
        "This is an external reference, not a risk estimate for New York or a fixed safe distance.",
 }
-st.markdown(
-    f'<div class="interpretation"><div class="interpretation-label">What this tells us</div>'
-    f'<p>{interpretations[page]}</p></div>', unsafe_allow_html=True,
-)
 
 
 def chart(fig, selectable=False):
@@ -275,3 +271,8 @@ else:
                "Source: CARB, Table 3 (Sacramento conditions). Bars show the upper end "
                "of each range; <1 is drawn at 0.5 for display only. "
                "These are Sacramento scenarios, not estimates for New York schools.")
+
+st.markdown(
+    f'<div class="interpretation"><div class="interpretation-label">What this tells us</div>'
+    f'<p>{interpretations[page]}</p></div>', unsafe_allow_html=True,
+)
